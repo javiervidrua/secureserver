@@ -381,7 +381,7 @@ function updateSystem(){
 function usage() {
     echo "[*] Usage: sudo ./$SCRIPT_NAME"
     echo "      -h,  --help     Output this help and exit"
-    echo "      -q,  --quiet    Only output the neccesary things"
+    echo "      -q,  --quiet    Only output the neccessary things"
     echo ""
     echo "[*] Example: sudo ./$SCRIPT_NAME --quiet"
 }
