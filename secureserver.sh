@@ -124,7 +124,7 @@ maxretry  = 30' > /etc/fail2ban/jail.local
     return 0
 }
 
-function configureRkhunter(){
+function configureRootkitHunter(){
     [ $QUIET -eq 1 ] || echo '[*] Installing rkhunter'
     apt install rkhunter -y
     # create the cronjob to analyse the system each day 
@@ -204,6 +204,11 @@ function main(){
         echo "[*] Quiet mode"
     fi
 
+    secureCronDirectory
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
     securePasswdFile && rm -rf /etc/passwd.old
     if [ $? -ne 0 ]; then
         if [ $? -eq 1 ]; then
@@ -212,12 +217,20 @@ function main(){
         exit 1
     fi
 
-    secureCronDirectory
+    secureSSHservice && rm -rf /etc/ssh/sshd_config.old
+    if [ $? -ne 0 ]; then
+        if [ $? -eq 2 ]; then
+            restoreBackup /etc/ssh/sshd_config
+        fi
+        exit 1
+    fi
+
+    secureSSHdirectory
     if [ $? -ne 0 ]; then
         exit 1
     fi
 
-    configureRkhunter && rm -rf /etc/rkhunter.conf.old
+    configureRootkithunter && rm -rf /etc/rkhunter.conf.old
     if [ $? -ne 0 ]; then
         if [ $? -eq 2 ]; then
             restoreBackup /etc/rkhunter.conf
@@ -232,14 +245,6 @@ function main(){
 
     configureClamav
     if [ $? -ne 0 ]; then
-        exit 1
-    fi
-
-    secureSSH && rm -rf /etc/ssh/sshd_config.old
-    if [ $? -ne 0 ]; then
-        if [ $? -eq 2 ]; then
-            restoreBackup /etc/ssh/sshd_config
-        fi
         exit 1
     fi
 
@@ -338,14 +343,14 @@ function securePasswdFile(){ # check /etc/passwd to look for anything strange an
     return 0
 }
 
-function secureSSH(){
+function secureSSHservice(){
     checkFileReadable /etc/ssh/sshd_config || exit 1
     createBackup /etc/ssh/sshd_config
     if [ $? -ne 0 ]; then
         return 1
     fi
 
-    [ $QUIET -eq 1 ] || echo "[*] Securing SSH"
+    [ $QUIET -eq 1 ] || echo "[*] Securing SSH service"
     searchAndReplace "LoginGraceTime" "LoginGraceTime 15" /etc/ssh/sshd_config && \
     searchAndReplace "MaxAuthTries" "MaxAuthTries 3" /etc/ssh/sshd_config && \
     searchAndReplace "MaxStartups" "MaxStartups 10:30:100" /etc/ssh/sshd_config && \
@@ -358,6 +363,37 @@ function secureSSH(){
         return 2
     fi
 
+    [ $QUIET -eq 1 ] || echo "[*] SSH service secured"
+    return 0
+}
+
+function secureSSHdirectory(){
+    [ $QUIET -eq 1 ] || echo "[*] Securing SSH directory"
+    SSH_DIR='/root/.ssh'
+    checkFileReadable ${SSH_DIR}
+    if [ $? -ne 0 ]; then
+        echo "${red}[-] Error: ${SSH_DIR} not readable${reset}"
+        return 1
+    fi
+    
+    chown root:root -R $SSH_DIR && \
+    chmod 700 $SSH_DIR
+    if [ $? -ne 0 ]; then
+        echo "${red}[-] Error: Could not secure ${SSH_DIR}${reset}"
+        return 2
+    fi 
+
+    if [ checkFileReadable "${SSH_DIR}/authorized_keys" ]; then
+        [ $QUIET -eq 1 ] || echo "[*] Securing ${SSH_DIR}/authorized_keys"
+        chmod 400 $SSH_DIR/authorized_keys && \
+        chattr +i $SSH_DIR/authorized_keys
+        if [ $? -ne 0 ]; then
+            echo "${red}[-] Error: Could not secure ${SSH_DIR}/authorized_keys${reset}"
+            return 3
+        fi
+    fi
+
+    [ $QUIET -eq 1 ] || echo "[*] SSH directory secured"
     return 0
 }
 
@@ -381,7 +417,7 @@ function updateSystem(){
 function usage() {
     echo "[*] Usage: sudo ./$SCRIPT_NAME"
     echo "      -h,  --help     Output this help and exit"
-    echo "      -q,  --quiet    Only output the neccessary things"
+    echo "      -q,  --quiet    Only output the neccesary things"
     echo ""
     echo "[*] Example: sudo ./$SCRIPT_NAME --quiet"
 }
