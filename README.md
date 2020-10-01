@@ -2,7 +2,7 @@
 A tool to secure a Debian-based server.
 
 ## What does it do?
-* Secures */etc/passwd* (only one root user)
+* Secures */etc/passwd* (makes sure there is only one root user)
 * Secures *cron.d*
 * Installs and configures *rkhunter*
 * Installs and configures *UFW*
