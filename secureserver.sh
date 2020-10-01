@@ -124,7 +124,7 @@ maxretry  = 30' > /etc/fail2ban/jail.local
     return 0
 }
 
-function configureRootkitHunter(){
+function configureRkhunter(){
     [ $QUIET -eq 1 ] || echo '[*] Installing rkhunter'
     apt install rkhunter -y
     # create the cronjob to analyse the system each day 
@@ -217,7 +217,7 @@ function main(){
         exit 1
     fi
 
-    configureRootkithunter && rm -rf /etc/rkhunter.conf.old
+    configureRkhunter && rm -rf /etc/rkhunter.conf.old
     if [ $? -ne 0 ]; then
         if [ $? -eq 2 ]; then
             restoreBackup /etc/rkhunter.conf
