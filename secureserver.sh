@@ -428,5 +428,5 @@ function usage() {
 checkArguments $@
 checkRoot
 main
-ELAPSED_TIME="[*]Elapsed time: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+ELAPSED_TIME="[*] Elapsed time: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
 [ $QUIET -eq 1 ] || echo $ELAPSED_TIME
