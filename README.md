@@ -1,5 +1,5 @@
 # secureserver
-A tool to secure a Debian-based server.
+A tool to secure a Debian-based server. It takes out 30-60 minutes of sysadmin tasks.
 
 ## What does it do?
 * Secures */etc/passwd* (makes sure there is only one root user)
@@ -16,4 +16,4 @@ A tool to secure a Debian-based server.
 
 ## Options
 * `-h, --help`: Output the help and exit
-* `-q, --quit`: Only output the neccessary things
+* `-q, --quiet`: Only output the neccessary things
