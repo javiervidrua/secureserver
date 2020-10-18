@@ -173,7 +173,7 @@ function configureUfw(){
     function allowUfw(){
         ufw allow ${1}
     }
-    ufw allow ftp ssh smtp http pop3 imap https
+    ufw allow "ftp ssh smtp http pop3 imap https"
     if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not allow common services through ufw${reset}"
         return 1
