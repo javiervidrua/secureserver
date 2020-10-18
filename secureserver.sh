@@ -110,12 +110,12 @@ function configureFail2ban(){
 bantime  = 30m
 findtime  = 60
 maxretry  = 30' > /etc/fail2ban/jail.local
-    if [ $? -ne 0 ];
+    if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not configure fail2ban${reset}"
         return 2
     fi
     service fail2ban restart
-    if [ $? -ne 0 ];
+    if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not restart fail2ban${reset}"
         return 2
     fi
@@ -412,6 +412,7 @@ function updateSystem(){
     apt update && apt upgrade -y && apt autoremove -y && apt autoclean -y
     if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not update the system${reset}"
+    fi
 }
 
 function usage() {
