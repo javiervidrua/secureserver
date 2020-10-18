@@ -62,7 +62,7 @@ function checkArguments(){
 }
 
 function checkFileReadable(){
-    [ -r ${1} ]
+    [ -r "${1}" ]
     if [ $? -ne 0 ]; then
         echo "${red}[-] Error: ${1} file is not readable${reset}"
         return 1
@@ -230,7 +230,7 @@ function main(){
         exit 1
     fi
 
-    configureRootkithunter && rm -rf /etc/rkhunter.conf.old
+    configureRootkitHunter && rm -rf /etc/rkhunter.conf.old
     if [ $? -ne 0 ]; then
         if [ $? -eq 2 ]; then
             restoreBackup /etc/rkhunter.conf
@@ -265,10 +265,10 @@ function main(){
 }
 
 function searchAndReplace(){
-    COUNTER=$(grep -E *$1* $3 -n | cut -d: -f1)
-    if [[ -z $(grep -E *$1* $3 -n | cut -d: -f1) ]]; then
+    COUNTER=$(grep -E "*$1*" "$3" -n | cut -d: -f1)
+    if [[ -z $(grep -E "*$1*" "$3" -n | cut -d: -f1) ]]; then
         return 1
-    elif [[ $(grep -E *$1* $3 -n | cut -d: -f1) -gt 1 ]]; then
+    elif [[ $(grep -E "*$1*" "$3" -n | cut -d: -f1 | wc -l) -gt 1 ]]; then
         return 2
     fi
     TO_SED="$COUNTER""s/.*/""$2""/"
@@ -355,7 +355,7 @@ function secureSSHservice(){
     searchAndReplace "MaxAuthTries" "MaxAuthTries 3" /etc/ssh/sshd_config && \
     searchAndReplace "MaxStartups" "MaxStartups 10:30:100" /etc/ssh/sshd_config && \
     searchAndReplace "MaxSessions" "MaxSessions 3" /etc/ssh/sshd_config && \
-    searchAndReplace "PermitRootLogin prohibit-password" "PermitRootLogin no" /etc/ssh/sshd_config && \
+    searchAndReplace "PermitRootLogin no" "PermitRootLogin no" /etc/ssh/sshd_config && \
     echo 'Protocol 2' >> /etc/ssh/sshd_config
     if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not configure SSH${reset}"
