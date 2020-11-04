@@ -355,7 +355,7 @@ function secureSSHservice(){
     searchAndReplace "MaxAuthTries" "MaxAuthTries 3" /etc/ssh/sshd_config && \
     searchAndReplace "MaxStartups" "MaxStartups 10:30:100" /etc/ssh/sshd_config && \
     searchAndReplace "MaxSessions" "MaxSessions 3" /etc/ssh/sshd_config && \
-    searchAndReplace "PermitRootLogin no" "PermitRootLogin no" /etc/ssh/sshd_config && \
+    searchAndReplace "PermitRootLogin prohibit-password" "PermitRootLogin no" /etc/ssh/sshd_config && \
     echo 'Protocol 2' >> /etc/ssh/sshd_config
     if [ $? -ne 0 ]; then
         echo "${red}[-] Error: Could not configure SSH${reset}"
